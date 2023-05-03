@@ -1,20 +1,22 @@
-import MapView from '@arcgis/core/views/MapView';
 import WebMap from '@arcgis/core/WebMap';
-import IdentityManager from '@arcgis/core/identity/IdentityManager';
 import esriRequest from '@arcgis/core/request';
+import MapView from '@arcgis/core/views/MapView';
+import IdentityManager from '@arcgis/core/identity/IdentityManager';
 
 export function initializeMap(ref) {
     IdentityManager.checkSignInStatus(
-        'https://jakalacorp.maps.arcgis.com/arcgis/sharing'
+        `${import.meta.env.VITE_REACT_APP_PORTAL_URL}/arcgis/sharing`
     )
         .then(function () {
             console.log('User Logged in, proceeding');
         })
         .catch(function () {
             console.log('User not logged in.. Logging in...');
-            const referer = document.URL; // || 'https://www.tradedimensions.io/';
+            const referer = document.URL;
             esriRequest(
-                'https://jakalacorp.maps.arcgis.com/sharing/rest/generateToken',
+                `${
+                    import.meta.env.VITE_REACT_APP_PORTAL_URL
+                }/sharing/rest/generateToken`,
                 {
                     responseType: 'json',
                     method: 'post',
@@ -30,7 +32,9 @@ export function initializeMap(ref) {
                 .then(function (response) {
                     IdentityManager.registerToken({
                         expires: response.data.expires,
-                        server: 'https://jakalacorp.maps.arcgis.com/sharing/rest',
+                        server: `${
+                            import.meta.env.VITE_REACT_APP_PORTAL_URL
+                        }/sharing/rest`,
                         ssl: true,
                         token: response.data.token,
                         userId: import.meta.env.VITE_REACT_APP_USER_ID,
@@ -42,7 +46,7 @@ export function initializeMap(ref) {
                 });
         });
 
-    // create from a web map?
+    // create from a web map
     const webmap = new WebMap({
         portalItem: {
             id: import.meta.env.VITE_REACT_APP_PORTAL_ID,
